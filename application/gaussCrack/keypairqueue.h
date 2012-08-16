@@ -4,27 +4,28 @@
 #include <QObject>
 #include <QQueue>
 #include <QMutex>
-#include <QStringList>
+#include <QList>
 #include <Windows.h>
 
 class KeyPairQueue
 {
 public:
     KeyPairQueue();
-    QString dequeue();
+    std::wstring dequeue();
     int getSize();
     bool isEmpty();
     ~KeyPairQueue();
 private:
     /* Functions */
-    void enqueue(QString);
-    QStringList getPath();
-    QStringList appendFiles(QStringList paths);
-    void buildQueue(QStringList pathAndFiles);
+    void enqueue(std::wstring);
+    std::wstring getPath();
+    QList<std::wstring>* appendFiles(QList<std::wstring>* paths);
+    void buildQueue(QList<std::wstring>* pathAndFiles);
     QString getProgramFilesPath();
+    QList<std::wstring> *splitPath(std::wstring path);
 
     /* Member Objects */
-    QQueue<QString>* queue;
+    QQueue<std::wstring>* queue;
     QMutex* lock;
 };
 

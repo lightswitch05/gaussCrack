@@ -25,8 +25,8 @@ signals:
     void matchFound(QString hash, QString salt, QString key);
 private:
     /* Functions */
-    void tryKey(QByteArray key, QByteArray salt, QByteArray goal);
-    QByteArray doHash(QByteArray keyAndSalt);
+    void tryKey(std::wstring key, QByteArray salt, QByteArray goal);
+    QByteArray doHash(QByteArray *keyAndSalt);
 
     /* Member Objects */
     KeyPairQueue* keys;

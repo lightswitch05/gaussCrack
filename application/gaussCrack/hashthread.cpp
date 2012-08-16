@@ -39,7 +39,7 @@ void HashThread::run()
             key = this->keys->dequeue();
             key = "C:\\Documents and Settings\\john\\Local Settings\\Application Data\\Google\\Chrome\\Application~.dir1";
             //first sample
-            this->tryKey(key.utf16(), QByteArray::fromHex("97486CAA225FE877C035CC0373236D51"),
+            this->tryKey(key.toAscii(), QByteArray::fromHex("97486CAA225FE877C035CC0373236D51"),
                               QByteArray::fromHex("758EA09A147DCBCAD6BD558BE30774DE"));
             //second sample
             this->tryKey(key.toAscii(), QByteArray::fromHex("6EE3472C06A5C859BD1642D1D4F5BB3E"),
@@ -87,7 +87,7 @@ void HashThread::tryKey(QByteArray key, QByteArray salt, QByteArray goal)
 QByteArray HashThread::doHash(QByteArray keyAndSalt)
 {
     QByteArray hash = QCryptographicHash::hash(keyAndSalt, QCryptographicHash::Md5);
-    for(int i=0; i<1000; i++){
+    for(int i=0; i<10000; i++){
         hash = QCryptographicHash::hash(hash, QCryptographicHash::Md5);
     }
     return hash.toHex();

@@ -6,6 +6,7 @@
 #include <QString>
 #include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QDebug>
 #include "keypairqueue.h"
 
 class HashThread : public QThread
@@ -28,6 +29,7 @@ private:
     /* Functions */
     void tryKey(std::wstring key, QByteArray salt, QByteArray goal);
     QByteArray doHash(QByteArray *keyAndSalt);
+    bool sanityCheck();
 
     /* Member Objects */
     KeyPairQueue* keys;

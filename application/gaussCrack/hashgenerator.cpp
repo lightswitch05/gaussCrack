@@ -1,10 +1,5 @@
 #include "hashgenerator.h"
 
-#define DEBUG true
-#ifdef DEBUG
-    #include <QDebug>
-#endif
-
 /**
   * Constructor
   */
@@ -36,9 +31,7 @@ void HashGenerator::spawnThreads()
 {
     HashThread* temp;
     while(this->threadPool->size() < this->threadCount){
-        #ifdef DEBUG
-            qWarning() << "Spawning a thread";
-        #endif
+        qDebug() << "Spawning a thread";
         temp = new HashThread(keys);
         //Progress
         this->connect(temp,
@@ -58,9 +51,7 @@ void HashGenerator::spawnThreads()
         this->threadPool->append( temp );
         temp->start();
     }
-    #ifdef DEBUG
-        qWarning() << "Spawned " << this->threadPool->size() << " Threads";
-    #endif
+    qDebug() << "Spawned " << this->threadPool->size() << " Threads";
 }
 
 /**
@@ -69,9 +60,7 @@ void HashGenerator::spawnThreads()
 void HashGenerator::start()
 {
     for(int i=0; i < this->threadPool->size(); i++){
-        #ifdef DEBUG
-            qWarning() << "starting thread";
-        #endif
+        qDebug() << "starting thread";
         this->threadsActive++;
         this->threadPool->at(i)->hash();
     }
@@ -83,9 +72,7 @@ void HashGenerator::start()
 void HashGenerator::stop()
 {
     for(int i=0; i < this->threadPool->size(); i++){
-        #ifdef DEBUG
-            qWarning() << "stopping thread";
-        #endif
+        qDebug() << "stopping thread";
         this->threadPool->at(i)->stop();
         this->threadsActive--;
     }
@@ -123,9 +110,7 @@ void HashGenerator::computeProgress(){
     this->hashsDone++;
     double percent = (double)this->hashsDone / (double)this->totalHashes;
     int result = percent * 100.00;
-    #ifdef DEBUG
-        qWarning() << "Hash Progress:" << result;
-    #endif
+    qDebug() << "Hash Progress:" << result;
     emit this->updatePercent(result);
 }
 
@@ -134,9 +119,7 @@ void HashGenerator::computeProgress(){
   */
 void HashGenerator::threadDone(){
     this->threadsActive--;
-    #ifdef DEBUG
-        qWarning() << "Now only have " << this->threadsActive << " active threads";
-    #endif
+    qDebug() << "Now only have " << this->threadsActive << " active threads";
     if(this->threadsActive == 0){
         emit this->done();
     }

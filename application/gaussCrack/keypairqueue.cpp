@@ -1,8 +1,5 @@
 #include "keypairqueue.h"
 
-#define DEBUG true
-#include <QDebug>
-
 /**
   * Constructor
   */
@@ -38,13 +35,11 @@ std::wstring KeyPairQueue::getPath()
     buff.resize(bufferSize);
     bufferSize = GetEnvironmentVariable(L"PATH", &buff[0], bufferSize);
     if (!bufferSize){
-        qWarning() << "No Path Found";
+        qCritical() << "No PATH Found";
         return NULL;
     }
     buff.resize(bufferSize);
-    #ifdef DEBUG
-        qWarning() << "Got Path:" << QString::fromStdWString(buff);
-    #endif
+    qDebug() << "Got Path var:" << QString::fromStdWString(buff);
     return buff;
 }
 
@@ -56,9 +51,7 @@ QList<std::wstring>* KeyPairQueue::splitPath(std::wstring path)
         for(uint i=0; i<path.length(); i++)
         {
             if(i != start && path.at(i) == ';') {
-                #ifdef DEBUG
-                    qWarning() << "Split:" << QString::fromStdWString(path.substr(start, i-start));
-                #endif
+                qDebug() << "Split:" << QString::fromStdWString(path.substr(start, i-start));
                 result->append( path.substr(start, i-start) );
                 start=i+1;
             }
@@ -78,41 +71,35 @@ QList<std::wstring>* KeyPairQueue::appendFiles(QList<std::wstring>* paths)
     WIN32_FIND_DATA FindFileData;
     HANDLE hFind;
 
-    qWarning() << "Starting:" << paths->size();
+    qDebug("appendFiles Starting with %i paths", paths->size());
 
     //Get the path to %PROGRAMFILES%
     QString searchDir = this->getProgramFilesPath() + "\\*";
     WCHAR* searchDirW = new WCHAR[searchDir.length()+1];
     searchDirW[searchDir.length()] = NULL;
     int size = searchDir.toWCharArray(searchDirW);
-    #ifdef DEBUG
-        qWarning() << "size used:" << size;
-        qWarning() << "Searching Path:" << QString::fromWCharArray(searchDirW);
-    #endif
+    qDebug() << "size used:" << size;
+    qDebug() << "Searching Path:" << QString::fromWCharArray(searchDirW);
 
     //find files
     hFind = FindFirstFileW(searchDirW, &FindFileData);
     if (hFind == INVALID_HANDLE_VALUE) {
-        qWarning() << "FindFirstFileW failed:" << GetLastError();
+        qCritical("FindFirstFileW failed: %lu", GetLastError());
     }
     else {
         if(FindFileData.cFileName[0] > 0x007A) {
             paths->append(FindFileData.cFileName);
-            #ifdef DEBUG
-                qWarning() << "Added File:" << QString::fromWCharArray(FindFileData.cFileName);
-            #endif
+            qDebug() << "Added File:" << QString::fromWCharArray(FindFileData.cFileName);
         }
         while( FindNextFileW(hFind, &FindFileData) ) {
             if(FindFileData.cFileName[0] > 0x007A) {
                 paths->append(FindFileData.cFileName);
-                #ifdef DEBUG
-                    qWarning() << "Added File:" << QString::fromWCharArray(FindFileData.cFileName);
-                #endif
+                qDebug() << "Added File:" << QString::fromWCharArray(FindFileData.cFileName);
             }
         }
         FindClose(hFind);
     }
-    qWarning() << "ending:" << paths->size();
+    qDebug("appendFiles Finished with %i paths", paths->size());
 
     return paths;
 }
@@ -127,13 +114,11 @@ QString KeyPairQueue::getProgramFilesPath()
     buff.resize(bufferSize);
     bufferSize = GetEnvironmentVariable(L"PROGRAMFILES", &buff[0], bufferSize);
     if (!bufferSize){
-        qWarning() << "No %PROGRAMFILES% Found!";
+        qCritical("No PROGRAMFILES var Found!");
         return QString();
     }
     buff.resize(bufferSize);
-    #ifdef DEBUG
-        qWarning() << "Got %PROGRAMFILES%:" << QString::fromStdWString(buff);
-    #endif
+    qDebug() << "Got PROGRAMFILES:" << QString::fromStdWString(buff);
     return QString::fromStdWString(buff);;
 }
 
@@ -154,7 +139,7 @@ QString KeyPairQueue::getProgramFilesPath()
 void KeyPairQueue::buildQueue(QList<std::wstring> *pathAndFiles)
 {
     std::wstring temp;
-    qWarning() << "buildQueue size:" << pathAndFiles->size();
+    qDebug() << "buildQueue start size:" << pathAndFiles->size();
     for(int column=0; column < pathAndFiles->size(); column++) {
         for(int row=0; row < pathAndFiles->size(); row++) {
             temp.clear();
@@ -163,6 +148,7 @@ void KeyPairQueue::buildQueue(QList<std::wstring> *pathAndFiles)
             this->enqueue( temp );
         }
     }
+    qDebug() << "buildQueue end size:" << this->getSize();
 }
 
 std::wstring KeyPairQueue::dequeue()
@@ -189,10 +175,7 @@ int KeyPairQueue::getSize(){
 
 void KeyPairQueue::enqueue(std::wstring keyPair)
 {
-    //this->lock->lock(); //since its private function, doesn't need lock
+    //since its private function, doesn't need a lock
     this->queue->enqueue(keyPair);
-    //this->lock->unlock();
-    #ifdef DEBUG
-        //qWarning() << "Queued KeyPair:" << keyPair;
-    #endif
+    qDebug("Queued KeyPair: %ls", keyPair.c_str());
 }

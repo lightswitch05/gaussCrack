@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QDebug>
 #include "keypairqueue.h"
 #include "hashthread.h"
 

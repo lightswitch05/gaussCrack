@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QList>
 #include <Windows.h>
+#include <QDebug>
 
 class KeyPairQueue
 {

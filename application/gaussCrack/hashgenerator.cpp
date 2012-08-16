@@ -11,6 +11,7 @@
 HashGenerator::HashGenerator(KeyPairQueue *keys, int threadCount)
 {
     this->hashsDone = 0;
+    this->threadsActive = 0;
     this->threadCount = threadCount;
     this->keys = keys;
     this->totalHashes = keys->getSize() * 4;
@@ -38,7 +39,7 @@ void HashGenerator::spawnThreads()
         #ifdef DEBUG
             qWarning() << "Spawning a thread";
         #endif
-        temp = new HashThread(this->keys);
+        temp = new HashThread(keys);
         //Progress
         this->connect(temp,
                       SIGNAL(hashComputed()),
@@ -49,8 +50,13 @@ void HashGenerator::spawnThreads()
                       SIGNAL(matchFound(QString,QString,QString)),
                       this,
                       SIGNAL(targetFound(QString,QString,QString)));
+         //Thread Done
+        this->connect(temp,
+                      SIGNAL(done()),
+                      this,
+                      SLOT(threadDone()));
         this->threadPool->append( temp );
-        temp->run();
+        temp->start();
     }
     #ifdef DEBUG
         qWarning() << "Spawned " << this->threadPool->size() << " Threads";
@@ -66,7 +72,8 @@ void HashGenerator::start()
         #ifdef DEBUG
             qWarning() << "starting thread";
         #endif
-        this->threadPool->at(i)->start();
+        this->threadsActive++;
+        this->threadPool->at(i)->hash();
     }
 }
 
@@ -80,6 +87,7 @@ void HashGenerator::stop()
             qWarning() << "stopping thread";
         #endif
         this->threadPool->at(i)->stop();
+        this->threadsActive--;
     }
 }
 
@@ -105,12 +113,31 @@ void HashGenerator::changeQueue(KeyPairQueue* keys)
     this->hashsDone = 0;
 }
 
+/**
+  * Keeps up with the amount the hashs to compute and
+  * the number already computed.
+  *
+  * emits % progress for progress bar
+  */
 void HashGenerator::computeProgress(){
     this->hashsDone++;
     double percent = (double)this->hashsDone / (double)this->totalHashes;
     int result = percent * 100.00;
     #ifdef DEBUG
-        qWarning() << "Hash Progress:" + result;
+        qWarning() << "Hash Progress:" << result;
     #endif
     emit this->updatePercent(result);
+}
+
+/**
+  * Slot called by each thread when its queue runs out
+  */
+void HashGenerator::threadDone(){
+    this->threadsActive--;
+    #ifdef DEBUG
+        qWarning() << "Now only have " << this->threadsActive << " active threads";
+    #endif
+    if(this->threadsActive == 0){
+        emit this->done();
+    }
 }

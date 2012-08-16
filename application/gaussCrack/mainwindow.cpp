@@ -44,6 +44,11 @@ void MainWindow::setupSignals()
                   SIGNAL(updatePercent(int)),
                   this->ui->progressBar,
                   SLOT(setValue(int)));
+    //Update Progress
+    this->connect(this->hash,
+                  SIGNAL(done()),
+                  this,
+                  SLOT(hashesDone()));
 }
 
 /**
@@ -53,10 +58,12 @@ void MainWindow::onStartButtonClick()
 {
     if(this->ui->startButton->text() == tr("Start") || this->ui->startButton->text() == tr("Resume")) {
         this->ui->startButton->setText(tr("Pause"));
+        this->ui->statusLabel->setText(tr("Running"));
         this->hash->start();
     }
     else {
         this->ui->startButton->setText(tr("Resume"));
+        this->ui->statusLabel->setText(tr("Idle"));
         this->hash->stop();
     }
 }
@@ -69,9 +76,18 @@ void MainWindow::onStopButtonClick()
     this->hash->stop();
     this->hash->changeQueue(new KeyPairQueue());
     this->ui->startButton->setText(tr("Start"));
+    this->ui->statusLabel->setText(tr("Idle"));
+    this->ui->progressBar->setValue(0);
 }
 
 void MainWindow::targetFound(QString hash, QString salt, QString key)
 {
 
+}
+
+void MainWindow::hashesDone()
+{
+    this->ui->startButton->setText(tr("Start"));
+    this->ui->statusLabel->setText(tr("Idle"));
+    this->hash->changeQueue(new KeyPairQueue());
 }

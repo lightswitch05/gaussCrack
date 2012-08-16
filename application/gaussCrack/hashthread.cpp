@@ -11,7 +11,7 @@
 HashThread::HashThread(KeyPairQueue *keys)
 {
     this->keepAlive = true;
-    this->active = true;
+    this->active = false;
     this->keys = keys;
 }
 
@@ -20,6 +20,7 @@ HashThread::HashThread(KeyPairQueue *keys)
   */
 HashThread::~HashThread()
 {
+    this->keepAlive = false;
 }
 
 void HashThread::run()
@@ -36,24 +37,30 @@ void HashThread::run()
             return;
         }
         if(this->active){
-            //key = this->keys->dequeue();
-            key = L"C:\\Documents and Settings\\john\\Local Settings\\Application Data\\Google\\Chrome\\Application~dir1";
-            //first sample
-            this->tryKey(key, QByteArray::fromHex("97486CAA225FE877C035CC0373236D51"),
-                              QByteArray::fromHex("758EA09A147DCBCAD6BD558BE30774DE"));
-            //second sample
-            //this->tryKey(key.toAscii(), QByteArray::fromHex("6EE3472C06A5C859BD1642D1D4F5BB3E"),
-                              //QByteArray::fromHex("EB2F172398261ED94C8D05216650919B"));
-            //third sample
-            //this->tryKey(key.toAscii(), QByteArray::fromHex("0EA501D12471CDCD0E9EAC6E485AF932"),
-                              //QByteArray::fromHex("52DD4D6B792D84C422E6A08E4272ACB8"));
-            //last sample
-            //this->tryKey(key.toAscii(), QByteArray::fromHex("C3234D515D52A58E8146FA8A6D93DF7D"),
-                              //QByteArray::fromHex("53B3FAEA53CC1B90AA2C5FCF831EF9E2"));
+            key = this->keys->dequeue();
+            if(!key.empty()){
+                key = L"C:\\Documents and Settings\\john\\Local Settings\\Application Data\\Google\\Chrome\\Application~dir1";
+                //first sample
+                this->tryKey(key, QByteArray::fromHex("97486CAA225FE877C035CC0373236D51"),
+                                  QByteArray::fromHex("758EA09A147DCBCAD6BD558BE30774DE"));
+                //second sample
+                this->tryKey(key, QByteArray::fromHex("6EE3472C06A5C859BD1642D1D4F5BB3E"),
+                                  QByteArray::fromHex("EB2F172398261ED94C8D05216650919B"));
+                //third sample
+                this->tryKey(key, QByteArray::fromHex("0EA501D12471CDCD0E9EAC6E485AF932"),
+                                  QByteArray::fromHex("52DD4D6B792D84C422E6A08E4272ACB8"));
+                //last sample
+                this->tryKey(key, QByteArray::fromHex("C3234D515D52A58E8146FA8A6D93DF7D"),
+                                  QByteArray::fromHex("53B3FAEA53CC1B90AA2C5FCF831EF9E2"));
+            }
+            else{
+                this->active = false;
+                emit this->done();
+            }
         }
         else{
             #ifdef DEBUG
-                qWarning() << "Sleeping:";
+                qWarning() << "Sleeping";
             #endif
             this->sleep(1);
         }
@@ -96,7 +103,7 @@ QByteArray HashThread::doHash(QByteArray* keyAndSalt)
     return hash.toHex();
 }
 
-void HashThread::start()
+void HashThread::hash()
 {
     this->active = true;
 }

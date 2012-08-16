@@ -11,7 +11,7 @@ class HashGenerator : public QObject
 {
     Q_OBJECT
 public:
-    HashGenerator(KeyPairQueue* keys, int threadCount=10);
+    HashGenerator(KeyPairQueue* keys, int threadCount=2);
     void run();
     ~HashGenerator();
 public slots:
@@ -20,15 +20,18 @@ public slots:
     void stop();
     void changeQueue(KeyPairQueue* keys);
     void computeProgress();
+    void threadDone();
 signals:
     void updatePercent(int);
     void targetFound(QString hash, QString salt, QString key);
+    void done();
 private:
     /* Functions */
     void spawnThreads();
 
     /* Member Objects */
     int threadCount;
+    int threadsActive;
     int totalHashes;
     int hashsDone;
     KeyPairQueue* keys;

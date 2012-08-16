@@ -21,6 +21,7 @@ private slots:
     void onStartButtonClick();
     void onStopButtonClick();
     void targetFound(QString hash, QString salt, QString key);
+    void hashesDone();
 
 private:
     /* Functions */

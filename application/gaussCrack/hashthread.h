@@ -16,13 +16,14 @@ public:
     HashThread(KeyPairQueue* keys);
     ~HashThread();
 public slots:
-    void start();
+    void hash();
     void stop();
     void kill();
     void changeQueue(KeyPairQueue* keys);
 signals:
     void hashComputed();
     void matchFound(QString hash, QString salt, QString key);
+    void done();
 private:
     /* Functions */
     void tryKey(std::wstring key, QByteArray salt, QByteArray goal);

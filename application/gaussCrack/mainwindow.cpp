@@ -8,8 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    this->hash = new HashGenerator(new KeyPairQueue());
     this->ui->setupUi(this);
+    this->hash = new HashGenerator(new KeyPairQueue(),this->ui->threadSpinBox->value());
     this->setupSignals();
 }
 
@@ -52,6 +52,11 @@ void MainWindow::setupSignals()
                   SIGNAL(done()),
                   this,
                   SLOT(hashesDone()));
+    //Change Thread Count
+    this->connect(this->ui->threadSpinBox,
+                  SIGNAL(valueChanged(int)),
+                  this->hash,
+                  SLOT(setThreadNumber(int)));
 }
 
 /**

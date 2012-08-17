@@ -22,19 +22,21 @@ public slots:
     void changeQueue(KeyPairQueue* keys);
     void computeProgress();
     void threadDone();
+    void setThreadNumber(int newAmount);
 signals:
     void updatePercent(int);
     void targetFound(QString hash, QString salt, QString key);
     void done();
 private:
     /* Functions */
-    void spawnThreads();
+    void spawnThread();
 
     /* Member Objects */
     int threadCount;
     int threadsActive;
     int totalHashes;
     int hashsDone;
+    bool hashActive;
     KeyPairQueue* keys;
     QList<HashThread*>* threadPool;
 };

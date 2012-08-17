@@ -7,11 +7,14 @@ HashGenerator::HashGenerator(KeyPairQueue *keys, int threadCount)
 {
     this->hashsDone = 0;
     this->threadsActive = 0;
-    this->threadCount = threadCount;
+    this->threadCount = 0;
     this->keys = keys;
+    this->hashActive = false;
     this->totalHashes = keys->getSize() * 4;
     this->threadPool = new QList<HashThread*>();
-    this->spawnThreads();
+    while(this->threadCount < threadCount){
+        this->spawnThread();
+    }
 }
 
 /**
@@ -27,31 +30,33 @@ HashGenerator::~HashGenerator()
     delete this->keys;
 }
 
-void HashGenerator::spawnThreads()
+void HashGenerator::spawnThread()
 {
     HashThread* temp;
-    while(this->threadPool->size() < this->threadCount){
-        qDebug() << "Spawning a thread";
-        temp = new HashThread(keys);
-        //Progress
-        this->connect(temp,
-                      SIGNAL(hashComputed()),
-                      this,
-                      SLOT(computeProgress()));
-        //Target Found
-        this->connect(temp,
-                      SIGNAL(matchFound(QString,QString,QString)),
-                      this,
-                      SIGNAL(targetFound(QString,QString,QString)));
-         //Thread Done
-        this->connect(temp,
-                      SIGNAL(done()),
-                      this,
-                      SLOT(threadDone()));
-        this->threadPool->append( temp );
-        temp->start();
+    qDebug() << "Spawning a thread";
+    temp = new HashThread(keys);
+    //Progress
+    this->connect(temp,
+                  SIGNAL(hashComputed()),
+                  this,
+                  SLOT(computeProgress()));
+    //Target Found
+    this->connect(temp,
+                  SIGNAL(matchFound(QString,QString,QString)),
+                  this,
+                  SIGNAL(targetFound(QString,QString,QString)));
+     //Thread Done
+    this->connect(temp,
+                  SIGNAL(done()),
+                  this,
+                  SLOT(threadDone()));
+    this->threadCount++;
+    this->threadPool->append( temp );
+    temp->start();
+    if(this->hashActive){
+        this->threadsActive++;
+        temp->hash();
     }
-    qDebug() << "Spawned " << this->threadPool->size() << " Threads";
 }
 
 /**
@@ -59,6 +64,7 @@ void HashGenerator::spawnThreads()
   */
 void HashGenerator::start()
 {
+    this->hashActive = true;
     for(int i=0; i < this->threadPool->size(); i++){
         qDebug() << "starting thread";
         this->threadsActive++;
@@ -71,6 +77,7 @@ void HashGenerator::start()
   */
 void HashGenerator::stop()
 {
+    this->hashActive = false;
     for(int i=0; i < this->threadPool->size(); i++){
         qDebug() << "stopping thread";
         this->threadPool->at(i)->stop();
@@ -121,6 +128,28 @@ void HashGenerator::threadDone(){
     this->threadsActive--;
     qDebug() << "Now only have " << this->threadsActive << " active threads";
     if(this->threadsActive == 0){
+        this->hashActive = false;
         emit this->done();
+    }
+}
+
+/**
+  * User has changed the number of threads to use
+  */
+void HashGenerator::setThreadNumber(int newAmount)
+{
+    //adding threads
+    while(newAmount > this->threadCount){
+        this->spawnThread();
+    }
+
+    //removing threads
+    while(newAmount < this->threadCount && threadPool->size() > 0){
+        qDebug() << "Dropping Threads to " << this->threadCount-1;
+        this->threadPool->first()->stop();
+        this->threadPool->first()->kill();
+        this->threadPool->removeFirst();
+        this->threadsActive--;
+        this->threadCount--;
     }
 }

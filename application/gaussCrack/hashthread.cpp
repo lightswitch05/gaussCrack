@@ -86,10 +86,31 @@ void HashThread::tryKey(std::wstring key, QByteArray salt, QByteArray goal)
 QByteArray HashThread::doHash(QByteArray* keyAndSalt)
 {
     QByteArray hash = QCryptographicHash::hash(*keyAndSalt, QCryptographicHash::Md5);
+    qDebug() << "First Hash value:" << QString(hash.toHex());
     for(int i=0; i<10000; i++){
         hash = QCryptographicHash::hash(hash, QCryptographicHash::Md5);
     }
     return hash.toHex();
+}
+
+/**
+  * 4. For each pair, append the first hard-coded 16-byte salt and calculate MD5 hash.
+  *
+  * Combines the key and salt into one QByteArray
+  */
+QByteArray* HashThread::combineKeyAndSalt(std::wstring key, QByteArray salt)
+{  
+    //Convert 16 bit wchar_t[] to char[] - doubles length
+    char tempArray[key.length()*2];
+    const wchar_t* keyArray = key.data();
+    for(uint i=0; i<key.length(); i++){
+        tempArray[i*2] = keyArray[i] & 0xff;
+        tempArray[i*2+1]=(keyArray[i] >> 8);
+    }
+    //Convert to QByteArray and append salt
+    QByteArray* result = new QByteArray(tempArray, key.length()*2);
+    result->append(salt);
+    return result;
 }
 
 void HashThread::hash()
@@ -115,10 +136,37 @@ void HashThread::changeQueue(KeyPairQueue* keys)
 
 bool HashThread::sanityCheck()
 {
+    if(!this->checkHashFunction()){
+        return false;
+    }
+    if(!this->testCombineKeyAndSalt()){
+        return false;
+    }
+    return true;
+}
+
+bool HashThread::testCombineKeyAndSalt()
+{
+    std::wstring key = L"C:\\Documents and Settings\\john\\Local Settings\\Application Data\\Google\\Chrome\\Application~dir1";
+    char salt[] = {0x97, 0x48, 0x6C, 0xAA, 0x22, 0x5F, 0xE8, 0x77, 0xC0, 0x35, 0xCC, 0x03, 0x73, 0x23, 0x6D, 0x51};
+    QByteArray* qSalt = new QByteArray(salt, sizeof(salt));
+    QByteArray* keyAndSalt = combineKeyAndSalt(key, salt);
+    QByteArray result = HashThread::doHash(keyAndSalt);
+    qDebug() << "testCombineKeyAndSalt got hash:" << QString(result);
+    if(QString(result) == "00916031b3e9513044436ee42b6aa273") {
+        return true;
+    }
+    qCritical("Key and Salt Validation Test Failed");
+    return false;
+}
+
+bool HashThread::checkHashFunction()
+{
     QByteArray testData = QByteArray::fromHex("43003A005C0044006F00630075006D0065006E0074007300200061006E0064002000530065007400740069006E00670073005C006A006F0068006E005C004C006F00630061006C002000530065007400740069006E00670073005C004100700070006C00690063006100740069006F006E00200044006100740061005C0047006F006F0067006C0065005C004300680072006F006D0065005C004100700070006C00690063006100740069006F006E007E006400690072003100BB494E77F925EEC03B89FCEDC2224A211500");
     QByteArray result = HashThread::doHash(&testData);
     if(QString(result) == "00916031b3e9513044436ee42b6aa273") {
         return true;
     }
+    qCritical("Hash Validation Function Test Failed");
     return false;
 }

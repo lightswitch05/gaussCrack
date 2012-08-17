@@ -30,6 +30,9 @@ private:
     void tryKey(std::wstring key, QByteArray salt, QByteArray goal);
     QByteArray doHash(QByteArray *keyAndSalt);
     bool sanityCheck();
+    bool checkHashFunction();
+    QByteArray* combineKeyAndSalt(std::wstring key, QByteArray salt);
+    bool testCombineKeyAndSalt();
 
     /* Member Objects */
     KeyPairQueue* keys;

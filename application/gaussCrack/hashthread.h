@@ -27,10 +27,10 @@ signals:
     void done();
 private:
     /* Functions */
-    void tryKey(std::wstring key, QByteArray salt, QByteArray goal);
-    QByteArray doHash(QByteArray *keyAndSalt);
+    void tryKey(std::wstring key, QByteArray salt, QString goal);
+    QString doHash(QByteArray *keyAndSalt);
     bool sanityCheck();
-    bool checkHashFunction();
+    bool testHashFunction();
     QByteArray* combineKeyAndSalt(std::wstring key, QByteArray salt);
     bool testCombineKeyAndSalt();
 

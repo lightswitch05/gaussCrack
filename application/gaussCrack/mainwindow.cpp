@@ -22,6 +22,9 @@ MainWindow::~MainWindow()
     delete this->ui;
 }
 
+/**
+  * Link all the slots and signals between the UI and the HashGenerator
+  */
 void MainWindow::setupSignals()
 {
     //Start Button
@@ -52,7 +55,7 @@ void MainWindow::setupSignals()
 }
 
 /**
-  * Slot for start/pause button
+  * Slot for UI start/pause button
   */
 void MainWindow::onStartButtonClick()
 {
@@ -69,7 +72,7 @@ void MainWindow::onStartButtonClick()
 }
 
 /**
-  * Slot for stop button
+  * Slot for UI stop button
   */
 void MainWindow::onStopButtonClick()
 {
@@ -80,14 +83,36 @@ void MainWindow::onStopButtonClick()
     this->ui->progressBar->setValue(0);
 }
 
+/**
+  * Slot called when HashGenerator reports a matching hash
+  */
 void MainWindow::targetFound(QString hash, QString salt, QString key)
 {
+    qWarning() << "MATCH HAS BEEN FOUND! hash:" <<  hash << " salt:" << salt << " key:" << key;
+    //Target found! Pause search
+    this->ui->startButton->setText(tr("Resume"));
+    this->ui->statusLabel->setText(tr("Idle"));
+    this->hash->stop();
 
+    //update UI
+    QPalette plt;
+    plt.setColor(QPalette::WindowText, Qt::darkRed);
+    this->ui->targetFoundLabel->setPalette(plt);
+    this->ui->targetFoundLabel->setText(tr("You Are The Target!") + "\nKeypair:"+key+ "\nSalt:"+salt+"\nHash:" +hash);
 }
 
+/**
+  * Slot called when HashGenerator has run all the hashs
+  */
 void MainWindow::hashesDone()
 {
+    //update UI
+    QPalette plt;
+    plt.setColor(QPalette::WindowText, Qt::darkGreen);
+    this->ui->targetFoundLabel->setPalette(plt);
+    this->ui->targetFoundLabel->setText(tr("System Passed. You are NOT the target."));
     this->ui->startButton->setText(tr("Start"));
     this->ui->statusLabel->setText(tr("Idle"));
+
     this->hash->changeQueue(new KeyPairQueue());
 }

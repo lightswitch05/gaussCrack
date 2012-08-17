@@ -1,3 +1,5 @@
+Gauss Crack is released under either the GPLv2 license or the BSD (3-point) license.
+
 The goal of the program is to find the target of the Gauss Virus so that the encrypted payload can finally be decrypted.
 
 The algorithm step taken by this application is outlined in https://www.securelist.com/en/blog/208193781/The_Mystery_of_the_Encrypted_Gauss_Payload#comments
@@ -14,3 +16,6 @@ Quick explination of the code:
 
     HashGenerator
         - Contains and manages multiple HashThreads. Intermediate between HashThread and MainWindow
+
+
+Copyright (c) 2012, Daniel White

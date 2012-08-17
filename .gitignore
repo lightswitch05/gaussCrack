@@ -28,3 +28,13 @@
 /application/buildDebug/debug/gaussCrack.exe
 /application/buildDebug/debug/gaussCrack.ilk
 /application/gaussCrack/gaussCrack.pro.user
+/application/buildRelease/release/GaussCheck.exe
+/application/buildRelease/release/GaussCheck.zip
+/application/buildRelease/release/libgcc_s_dw2-1.dll
+/application/buildRelease/release/mingwm10.dll
+/application/buildRelease/release/QtCore4.dll
+/application/buildRelease/release/QtGui4.dll
+/application/buildRelease/Makefile.Debug
+/application/buildRelease/Makefile.Release
+/application/buildRelease/ui_mainwindow.h
+/application/buildRelease/Makefile

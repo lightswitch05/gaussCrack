@@ -1,6 +1,5 @@
 #include "hashthread.h"
 
-
 /**
   * Constructor
   */
@@ -101,7 +100,7 @@ QString HashThread::doHash(QByteArray* keyAndSalt)
 QByteArray* HashThread::combineKeyAndSalt(std::wstring key, QByteArray salt)
 {  
     //Convert 16 bit wchar_t[] to char[] - doubles length
-    char tempArray[key.length()*2];
+    char* tempArray = new char[key.length()*2];
     const wchar_t* keyArray = key.data();
     for(uint i=0; i<key.length(); i++){
         tempArray[i*2] = keyArray[i] & 0xff;
@@ -109,6 +108,7 @@ QByteArray* HashThread::combineKeyAndSalt(std::wstring key, QByteArray salt)
     }
     //Convert to QByteArray and append salt
     QByteArray* result = new QByteArray(tempArray, key.length()*2);
+    delete tempArray;
     result->append(salt);
     return result;
 }

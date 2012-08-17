@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-TARGET = gaussCrack
+TARGET = GaussCheck
 TEMPLATE = app
 
 
@@ -22,3 +22,7 @@ HEADERS  += mainwindow.h \
             hashthread.h
 
 FORMS    += mainwindow.ui
+
+RC_FILE = resources.rc
+
+DEFINES += QT_NO_DEBUG_OUTPUT

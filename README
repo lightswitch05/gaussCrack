@@ -1,3 +1,16 @@
 The goal of the program is to find the target of the Gauss Virus so that the encrypted payload can finally be decrypted.
 
 The algorithm step taken by this application is outlined in https://www.securelist.com/en/blog/208193781/The_Mystery_of_the_Encrypted_Gauss_Payload#comments
+
+Quick explination of the code:
+    MainWindow
+        - All user input / output
+
+    KeyPairQueue
+        - Gets all the environment paths and applicaiton names outlined in validation step 1 and creates a queue of the key pairs
+
+    HashThread
+        - Pulls a keypair from the queue, appends salt, does the actual hashing and comparing
+
+    HashGenerator
+        - Contains and manages multiple HashThreads. Intermediate between HashThread and MainWindow

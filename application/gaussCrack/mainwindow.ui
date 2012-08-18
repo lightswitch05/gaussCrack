@@ -210,7 +210,7 @@ Are you the Target?</string>
        </font>
       </property>
       <property name="text">
-       <string>Version 1.0.0</string>
+       <string>Version 1.1.0</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>

@@ -57,6 +57,9 @@ QList<std::wstring>* KeyPairQueue::splitPath(std::wstring path)
             }
         }
     }
+    //Not sure what the virus does if the path has ';;' in it
+    //So go ahead and append the empty string just in case
+    result->append(L"");
     return result;
 }
 
@@ -100,6 +103,7 @@ QList<std::wstring>* KeyPairQueue::appendFiles(QList<std::wstring>* paths)
         FindClose(hFind);
     }
     qDebug("appendFiles Finished with %i paths", paths->size());
+    delete searchDirW;
 
     return paths;
 }
@@ -145,9 +149,15 @@ void KeyPairQueue::buildQueue(QList<std::wstring> *pathAndFiles)
             temp.clear();
             temp.append(pathAndFiles->at(column));
             temp.append(pathAndFiles->at(row));
-            this->enqueue( temp );
+
+            //Don't use the case where both are empty string.
+            //Causes queue issues and won't be the solution anyways.
+            if(!temp.empty()) {
+                this->enqueue( temp );
+            }
         }
     }
+    delete pathAndFiles;
     qDebug() << "buildQueue end size:" << this->getSize();
 }
 

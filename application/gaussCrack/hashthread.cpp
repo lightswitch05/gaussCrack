@@ -77,6 +77,7 @@ void HashThread::tryKey(std::wstring key, QByteArray salt, QString goal)
         emit matchFound(hash, QString(salt.toHex()), QString::fromStdWString(key));
     }
     emit hashComputed();
+    delete keyAndSalt;
 }
 
 /**

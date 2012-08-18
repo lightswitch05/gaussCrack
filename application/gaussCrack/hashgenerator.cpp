@@ -25,9 +25,10 @@ HashGenerator::~HashGenerator()
     for(int i=0; i < this->threadPool->size(); i++){
         this->threadPool->at(i)->stop();
         this->threadPool->at(i)->kill();
-        delete this->threadPool->at(i);
+        this->threadPool->at(i)->deleteLater();
     }
     delete this->keys;
+    delete this->threadPool;
 }
 
 void HashGenerator::spawnThread()
@@ -103,6 +104,7 @@ void HashGenerator::changeQueue(KeyPairQueue* keys)
     }
     delete(this->keys);
     this->keys = keys;
+    //There are 4 samples to compute for each keypair
     this->totalHashes = keys->getSize() * 4;
     this->hashsDone = 0;
 }
@@ -149,7 +151,9 @@ void HashGenerator::setThreadNumber(int newAmount)
         this->threadPool->first()->stop();
         this->threadPool->first()->kill();
         this->threadPool->removeFirst();
-        this->threadsActive--;
+        if(this->hashActive){
+            this->threadsActive--;
+        }
         this->threadCount--;
     }
 }

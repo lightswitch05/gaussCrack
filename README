@@ -18,4 +18,6 @@ Quick explination of the code:
         - Contains and manages multiple HashThreads. Intermediate between HashThread and MainWindow
 
 
+USE AT YOUR OWN RISK. This software is provided 'AS IS' without any express or implied warranty of any kind.
+
 Copyright (c) 2012, Daniel White

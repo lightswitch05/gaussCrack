@@ -38,3 +38,15 @@
 /application/buildRelease/Makefile.Release
 /application/buildRelease/ui_mainwindow.h
 /application/buildRelease/Makefile
+/application/buildRelease/release/resources_res.o
+/application/buildRelease/release/moc_mainwindow.o
+/application/buildRelease/release/moc_mainwindow.cpp
+/application/buildRelease/release/moc_hashthread.o
+/application/buildRelease/release/moc_hashgenerator.o
+/application/buildRelease/release/moc_hashgenerator.cpp
+/application/buildRelease/release/moc_hashthread.cpp
+/application/buildRelease/release/mainwindow.o
+/application/buildRelease/release/keypairqueue.o
+/application/buildRelease/release/main.o
+/application/buildRelease/release/hashgenerator.o
+/application/buildRelease/release/hashthread.o

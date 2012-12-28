@@ -12,6 +12,7 @@ Gauss Crack was created in response to the Gauss Virus. The Gauss Virus contains
 
 ## Code
 * Quick explination of the code:
+    * Written using Qt's C++ framework. Generates a queue of all the keypairs then uses a variable number of threads to hash them
     * [MainWindow](https://github.com/lightswitch05/gaussCrack/blob/master/application/gaussCrack/mainwindow.cpp)
         * All user input / output
     * [KeyPairQueue](https://github.com/lightswitch05/gaussCrack/blob/master/application/gaussCrack/keypairqueue.cpp)
